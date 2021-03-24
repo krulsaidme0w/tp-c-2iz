@@ -1,5 +1,19 @@
-#include <stdlib.h>
+#include <pthread.h>
+#include <stdio.h>
 
-char * thread_create_array(size_t size) {
+void *thread_init(void *value) {
+    printf("asd");
     return NULL;
-}
+};
+
+pthread_t create_thread() {
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_init, NULL);
+    return thread;
+};
+
+
+char* find_max_len_el(void * v) {
+    return NULL;
+};
+

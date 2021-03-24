@@ -1,6 +1,10 @@
 #ifndef WITH_THREAD_H
 #define WITH_THREAD_H
 
-char* thread_create_array();
+#include <pthread.h>
+
+pthread_t create_thread();
+void* find_max_len_el(void *v);
+
 
 #endif

@@ -1,4 +1,0 @@
-#ifndef TP_C_IZ2_STRING_GEN_H
-#define TP_C_IZ2_STRING_GEN_H
-
-#endif //TP_C_IZ2_STRING_GEN_H
