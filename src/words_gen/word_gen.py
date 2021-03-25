@@ -15,7 +15,7 @@ def gen_word(min, max):
     for i in range(length):
         word += gen_char()
 
-    return word
+    return word + ' '
 
 
 def save_word(words):

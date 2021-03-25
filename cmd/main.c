@@ -1,11 +1,5 @@
-#include <stdio.h>
-#include "no_threads.h"
-#include "with_threads.h"
-#include <pthread.h>
-
-const size_t SIZE = 1000000000;
+#include "menu.h"
 
 int main() {
-
-    return 0;
+    menu();
 }
