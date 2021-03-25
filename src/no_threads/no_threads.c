@@ -22,7 +22,7 @@ FILE* open_file(char* path) {
 };
 
 bool close_file(FILE *f) {
-    if(fclose(f)) {
+    if(!fclose(f)) {
         return 1;
     }
     else {
@@ -54,10 +54,46 @@ size_t fill_array(char *array, size_t size, char* path_to_words, size_t max_buff
 
     }
 
-    printf("%s\n", array);
-    printf("%zu\n", strlen(array));
+    if(!close_file(f)) {
+        return 0;
+    }
 
-    close_file(f);
-    return 1;
+    return strlen(array);
 };
 
+char* find_max_word(const char* array, size_t length, size_t max_buffer_length) {
+
+    size_t max_length = 0;
+    char *max_word = NULL;
+
+    size_t word_length = 0;
+    char* word = (char*)malloc(sizeof(char*) * max_buffer_length);
+
+
+    for(size_t i = 0; i < length; ++i) {
+        char c = array[i];
+
+        if(c != ' ') {
+            word[word_length] = array[i];
+            word_length++;
+        }
+        else {
+            if(word_length > max_length) {
+                word[word_length] = '\0';
+                max_length = word_length;
+                max_word = word;
+            }
+            word = (char*)malloc(sizeof(char*) * max_buffer_length);
+            word_length = 0;
+        }
+    }
+
+    return max_word;
+
+};
+
+bool print_array(char* array) {
+    if(printf("%s\n",array))
+        return 1;
+    return 0;
+};
