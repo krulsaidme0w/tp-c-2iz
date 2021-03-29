@@ -115,7 +115,6 @@ void menu() {
             printf("\nlongest word: %s\n", max_word);
             printf("length: %zu\n", strlen(max_word));
             printf("time: %f\n", time_spent);
-            free(max_word);
 
             continue;
         }

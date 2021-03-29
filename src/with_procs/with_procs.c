@@ -46,8 +46,8 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             exit(EXIT_FAILURE);
         }
 
-        Message msg = {message_t, max_word};
-        if(-1 == msgsnd(qid, &msg, sizeof(msg.mtext), 0)) {
+        Message message = {message_t, max_word};
+        if(-1 == msgsnd(qid, &message, sizeof(message.mtext), 0)) {
             printf("can't send msg\n");
             exit(EXIT_FAILURE);
         }
@@ -59,6 +59,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
     }
 
     max_word = "";
+    size_t max_len = 0;
 
     for (size_t i = 0; i < procs_count; ++i) {
         Message message = {message_t, 0};
@@ -69,12 +70,12 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             return NULL;
         }
 
-        if(strlen(max_word) < strlen(message.mtext) && message.mtext != NULL) {
+        if(max_len < strlen(message.mtext) && message.mtext != NULL) {
             max_word = message.mtext;
+            max_len = strlen(message.mtext);
         }
     }
 
-    free(pids);
     return max_word;
 }
 
