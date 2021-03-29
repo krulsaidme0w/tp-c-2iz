@@ -3,12 +3,14 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "no_procs.h"
+
 char* create_array(size_t size) {
     char *array = (char *)malloc(size);
     return array;
-};
+}
 
-FILE* open_file(char* path) {
+FILE* open_file(const char* path) {
     FILE  *f;
     f = fopen(path, "r");
 
@@ -19,7 +21,7 @@ FILE* open_file(char* path) {
         printf("can't open file\n");
         return NULL;
     }
-};
+}
 
 bool close_file(FILE *f) {
     if(!fclose(f)) {
@@ -28,9 +30,9 @@ bool close_file(FILE *f) {
     else {
         return 0;
     }
-};
+}
 
-size_t fill_array(char *array, size_t size, char* path_to_words, size_t max_buffer_length) {
+size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_words, size_t max_buffer_length) {
 
     FILE *f = open_file(path_to_words);
 
@@ -44,7 +46,7 @@ size_t fill_array(char *array, size_t size, char* path_to_words, size_t max_buff
 
         buffer[strlen(buffer) - 1] = '\0';
 
-        if (strlen(array) + strlen(buffer) < size) {
+        if (strlen(array) + strlen(buffer) - begin <= end) {
             char *t = array + strlen(array);
             strcpy(t, buffer);
         }
@@ -59,9 +61,9 @@ size_t fill_array(char *array, size_t size, char* path_to_words, size_t max_buff
     }
 
     return strlen(array);
-};
+}
 
-char* find_max_word(const char* array, size_t length, size_t max_buffer_length) {
+char* find_max_word(const char* array, size_t begin, size_t end, size_t max_buffer_length) {
 
     size_t max_length = 0;
     char *max_word = NULL;
@@ -70,7 +72,7 @@ char* find_max_word(const char* array, size_t length, size_t max_buffer_length) 
     char* word = (char*)malloc(sizeof(char*) * max_buffer_length);
 
 
-    for(size_t i = 0; i < length; ++i) {
+    for(size_t i = begin; i <= end; ++i) {
         char c = array[i];
 
         if(c != ' ') {
@@ -90,10 +92,10 @@ char* find_max_word(const char* array, size_t length, size_t max_buffer_length) 
 
     return max_word;
 
-};
+}
 
 bool print_array(char* array) {
     if(printf("%s\n",array))
         return 1;
     return 0;
-};
+}

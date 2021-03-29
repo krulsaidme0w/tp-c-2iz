@@ -1,16 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "no_threads.h"
-#include "with_threads.h"
-#include <pthread.h>
-#include "menu.h"
 #include <time.h>
+#include <pthread.h>
 
-//const size_t SIZE = 100 * 1024 * 1024;
-const size_t SIZE = 100 * 1024 * 32;
+#include "no_procs.h"
+#include "with_procs.h"
+#include "menu.h"
+
+//consts for no_procs
+const size_t SIZE = 1024;
 const size_t MAX_BUFFER_LENGTH = 400;
 const char* PATH_TO_FILE = "/home/krul/Documents/tp-c-2iz/src/words_gen/words.txt";
+
+//consts for with_procs
+const size_t PROCS_COUNT = 4;
+
+
 
 char get_char() {
     char c = '\0';
@@ -76,28 +82,48 @@ void menu() {
             clock_t begin = clock();
 
             char* array = create_array(SIZE);
-            size_t array_length = fill_array(array, SIZE, PATH_TO_FILE, MAX_BUFFER_LENGTH);
-            char* max_word = find_max_word(array, array_length, MAX_BUFFER_LENGTH);
+            size_t array_length = fill_array(array, 0, SIZE - 1, PATH_TO_FILE, MAX_BUFFER_LENGTH);
+            char* max_word = find_max_word(array, 0, array_length - 1, MAX_BUFFER_LENGTH);
 
             clock_t end = clock();
 
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
-            printf("longest word: %s\n", max_word);
+            printf("\nlongest word: %s\n", max_word);
             printf("length: %zu\n", strlen(max_word));
             printf("time: %f\n", time_spent);
-            //print_array(array);
-
+            printf("%s", array);
             free(array);
+            free(max_word);
             continue;
         }
 
         else if(!strcmp(command, "2")) {
+
+            clock_t begin = clock();
+
+
+
+
+            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
+
+
+
+            clock_t end = clock();
+
+            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+
+            printf("\nlongest word: %s\n", max_word);
+            printf("length: %zu\n", strlen(max_word));
+            printf("time: %f\n", time_spent);
+            free(max_word);
+
             continue;
         }
 
         else if(!strcmp(command, "3")) {
-            printf("goodbye!\n");
+            printf("\ngoodbye!\n");
             break;
         }
 
