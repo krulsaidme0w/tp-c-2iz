@@ -95,7 +95,7 @@ char* find_max_word(const char* array, size_t begin, size_t end, size_t max_buff
 }
 
 bool print_array(char* array) {
-    if(printf("%s\n",array))
+    if(printf("%s\n",array) && array != NULL)
         return 1;
     return 0;
 }

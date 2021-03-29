@@ -2,20 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <pthread.h>
 
 #include "no_procs.h"
 #include "with_procs.h"
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 1024;
-const size_t MAX_BUFFER_LENGTH = 400;
-const char* PATH_TO_FILE = "/home/krul/Documents/tp-c-2iz/src/words_gen/words.txt";
+const size_t SIZE = 1024 * 1024;
+const size_t MAX_BUFFER_LENGTH = 1024;
+const char* PATH_TO_FILE = "words.txt";
 
 //consts for with_procs
 const size_t PROCS_COUNT = 4;
-
+const long MESSAGE_TYPE = 696969;
 
 
 char get_char() {
@@ -72,7 +71,7 @@ void menu() {
         if(!strcmp(command, "0")) {
             printf("0. help\n");
             printf("1. create array(no threads)\n");
-            printf("2. create array(with threads)\n");
+            printf("2. create array(with processes)\n");
             printf("3. exit");
             continue;
         }
@@ -92,7 +91,7 @@ void menu() {
             printf("\nlongest word: %s\n", max_word);
             printf("length: %zu\n", strlen(max_word));
             printf("time: %f\n", time_spent);
-            printf("%s", array);
+
             free(array);
             free(max_word);
             continue;
@@ -102,17 +101,16 @@ void menu() {
 
             clock_t begin = clock();
 
-
-
-
-            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
-
-
+            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE, MESSAGE_TYPE);
 
             clock_t end = clock();
 
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
+            if(max_word == NULL) {
+                printf("can't find max_word\n");
+                continue;
+            }
 
             printf("\nlongest word: %s\n", max_word);
             printf("length: %zu\n", strlen(max_word));
