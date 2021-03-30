@@ -25,7 +25,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
 
     key_t key = IPC_PRIVATE;
     int qid = msgget(key, (IPC_CREAT | 0660));
-    pid_t* pids = (pid_t *) malloc(sizeof(pid_t *) * procs_count);
+    pid_t* pids = (pid_t *) malloc(sizeof(pid_t) * procs_count);
 
     int status;
 
@@ -39,6 +39,11 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         array = create_array(parts_size);
         fill_array(array, 0, parts_size - 1, path_to_words, max_buffer_length);
 
+        if(array == NULL) {
+            printf("can't fill the array\n");
+            exit(EXIT_FAILURE);
+        }
+
         max_word = find_max_word(array, 0,  parts_size - 1, max_buffer_length);
 
         if(max_word == NULL) {
@@ -46,36 +51,55 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             exit(EXIT_FAILURE);
         }
 
-        Message message = {message_t, max_word};
-        if(-1 == msgsnd(qid, &message, sizeof(message.mtext), 0)) {
+        Message* message = NULL;
+        message->mtype = message_t;
+        strcpy(message->mtext, max_word);
+
+        printf("%s", message->mtext);
+
+        if(-1 == msgsnd(qid, (struct Message *)message, strlen(message->mtext) + 1, 999)) {
             printf("can't send msg\n");
             exit(EXIT_FAILURE);
         }
+
+        free(array);
+        free(max_word);
+
         exit(EXIT_SUCCESS);
     }
 
     for (size_t i = 0; i < procs_count; ++i) {
-        waitpid(pids[i], &status, 0);
+        if (waitpid(pids[i], &status, 0) != pids[i]) {
+            printf("can't wait for pids\n");
+            free(pids);
+            return NULL;
+        }
     }
 
     max_word = "";
     size_t max_len = 0;
 
     for (size_t i = 0; i < procs_count; ++i) {
-        Message message = {message_t, 0};
+        Message* message = NULL;
 
-        if(-1 == msgrcv(qid, &message, sizeof(message.mtext), message_t, 0)) {
+        if(-1 == msgrcv(qid, (struct Message *)message, max_buffer_length, message_t, 999)) {
             printf("can't receive msg\n");
             free(pids);
             return NULL;
         }
 
-        if(max_len < strlen(message.mtext) && message.mtext != NULL) {
-            max_word = message.mtext;
-            max_len = strlen(message.mtext);
+        if(message->mtext == NULL) {
+            printf("can't receive max_word\n");
+            return NULL;
+        }
+
+        if(max_len < strlen(message->mtext) && message->mtext != NULL) {
+            max_word = message->mtext;
+            max_len = strlen(message->mtext);
         }
     }
 
+    printf("%s", max_word);
     return max_word;
 }
 

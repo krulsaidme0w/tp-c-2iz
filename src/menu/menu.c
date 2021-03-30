@@ -94,6 +94,7 @@ void menu() {
 
             free(array);
             free(max_word);
+
             continue;
         }
 
