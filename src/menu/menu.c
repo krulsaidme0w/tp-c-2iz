@@ -8,13 +8,13 @@
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 1024 * 1024;
+const size_t SIZE = 1000;
 const size_t MAX_BUFFER_LENGTH = 1024;
 const char* PATH_TO_FILE = "words.txt";
 
 //consts for with_procs
-const size_t PROCS_COUNT = 4;
-const long MESSAGE_TYPE = 696969;
+const size_t PROCS_COUNT = 2;
+const long MESSAGE_TYPE = 999;
 
 
 char get_char() {
@@ -62,6 +62,7 @@ char *get_string() {
 
     return buf.string;
 }
+
 
 void menu() {
     char* command = "0";

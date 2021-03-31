@@ -10,7 +10,6 @@
 #include "no_procs.h"
 #include "with_procs.h"
 
-
 typedef struct {
     long mtype;
     char* mtext;
@@ -20,14 +19,16 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
 
     size_t parts_size = size / procs_count;
 
-    char* array = NULL;
-    char* max_word = NULL;
+    int status;
 
     key_t key = IPC_PRIVATE;
-    int qid = msgget(key, (IPC_CREAT | 0660));
-    pid_t* pids = (pid_t *) malloc(sizeof(pid_t) * procs_count);
+    int qid = msgget(key, 0666 | IPC_CREAT);
+    pid_t* pids = (pid_t *)malloc(sizeof(pid_t) * procs_count);
 
-    int status;
+    if(pids == NULL) {
+        printf("can't allocate memory for pids\n");
+        return NULL;
+    }
 
     for(size_t i = 0; i < procs_count; ++i) {
         pids[i] = fork();
@@ -35,6 +36,9 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         if (pids[i] != 0) {
             continue;
         }
+
+        char* array = NULL;
+        char* max_word = NULL;
 
         array = create_array(parts_size);
         fill_array(array, 0, parts_size - 1, path_to_words, max_buffer_length);
@@ -51,13 +55,9 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             exit(EXIT_FAILURE);
         }
 
-        Message* message = NULL;
-        message->mtype = message_t;
-        strcpy(message->mtext, max_word);
+        Message message = {message_t, max_word};
 
-        printf("%s", message->mtext);
-
-        if(-1 == msgsnd(qid, (struct Message *)message, strlen(message->mtext) + 1, 999)) {
+        if(-1 == msgsnd(qid, (struct msgbuf *)&message, sizeof(message.mtext) + 1, 0)) {
             printf("can't send msg\n");
             exit(EXIT_FAILURE);
         }
@@ -68,6 +68,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         exit(EXIT_SUCCESS);
     }
 
+
     for (size_t i = 0; i < procs_count; ++i) {
         if (waitpid(pids[i], &status, 0) != pids[i]) {
             printf("can't wait for pids\n");
@@ -76,26 +77,29 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         }
     }
 
-    max_word = "";
+    char* max_word = "";
     size_t max_len = 0;
 
     for (size_t i = 0; i < procs_count; ++i) {
-        Message* message = NULL;
+        Message message;
 
-        if(-1 == msgrcv(qid, (struct Message *)message, max_buffer_length, message_t, 999)) {
+        if(-1 == msgrcv(qid, (struct msgbuf *)&message, max_buffer_length, message_t, 0)) {
             printf("can't receive msg\n");
             free(pids);
             return NULL;
         }
 
-        if(message->mtext == NULL) {
+        printf("%s\n",message.mtext);
+        printf("%ld\n", message.mtype);
+
+        if(message.mtext == NULL) {
             printf("can't receive max_word\n");
             return NULL;
         }
 
-        if(max_len < strlen(message->mtext) && message->mtext != NULL) {
-            max_word = message->mtext;
-            max_len = strlen(message->mtext);
+        if(max_len < strlen(message.mtext) && message.mtext != NULL) {
+            max_word = message.mtext;
+            max_len = strlen(message.mtext);
         }
     }
 
