@@ -6,7 +6,8 @@
 #include "no_procs.h"
 
 char* create_array(size_t size) {
-    char *array = (char *)malloc(size);
+    char* array = (char *)malloc(size * sizeof(char));
+    array[0] = '\0';
     return array;
 }
 
@@ -73,7 +74,6 @@ char** create_matrix(const char* array, const char* path_to_words, size_t max_bu
     words_arr[k] = (char*)malloc(max_buffer_length * sizeof(char));
 
     while(array[j] != '\0') {
-
         if(array[j] == ' ') {
             words_arr[k][h] = '\0';
             words_arr[++k] = (char*)malloc(max_buffer_length * sizeof(char));
@@ -88,19 +88,24 @@ char** create_matrix(const char* array, const char* path_to_words, size_t max_bu
     return words_arr;
 }
 
-char* find_max_word(char** array, size_t words_count) {
+char* find_max_word(char** array, size_t words_count, size_t max_buffer_length) {
 
     size_t max_str_len = 0;
-    char* max_word;
-
+    char* max_word = NULL;
 
     for(size_t i = 0; i < words_count; i++) {
         if(max_str_len <= strlen(array[i])) {
             max_str_len = strlen(array[i]);
-            max_word = array[i];
+            free(max_word);
+            max_word = (char*)malloc(max_buffer_length * sizeof(char));
+            strcpy(max_word, array[i]);
         }
     }
 
+    if(max_word == NULL) {
+        printf("can't find no procs\n");
+        return NULL;
+    }
 
     return max_word;
 }
@@ -111,14 +116,15 @@ bool print_array(char* array) {
     return 0;
 }
 
-char* find_max_word_no_threads(size_t size, size_t max_buffer_length, const size_t procs_count, const char* path_to_words) {
+char* find_max_word_no_procs(size_t size, size_t max_buffer_length, size_t procs_count, const char* path_to_words) {
 
     char* array = create_array(size);
     size_t words_count = fill_array(array, 0, size - 1, path_to_words, max_buffer_length);
     char** words_arr = create_matrix(array, path_to_words, max_buffer_length, words_count);
-    char* max_word = find_max_word(words_arr, words_count);
+    char* max_word = find_max_word(words_arr, words_count, max_buffer_length);
 
     free(array);
+
     for(size_t i = 0; i < words_count; i++) {
         free(words_arr[i]);
     }

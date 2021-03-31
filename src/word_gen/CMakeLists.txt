@@ -1,1 +1,0 @@
-configure_file(words.txt  no_procs/words.txt COPYONLY)

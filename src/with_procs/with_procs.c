@@ -71,7 +71,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
 
 
         if(max_word == NULL) {
-            printf("can't find max word\n");
+            printf("can't find no procs\n");
             exit(EXIT_FAILURE);
         }
 
@@ -118,7 +118,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             max_word = (char*)malloc(max_buffer_length * sizeof(char));
 
             if(max_word == NULL) {
-                printf("can't allocate mem to max word\n");
+                printf("can't allocate mem to no procs\n");
                 return NULL;
             }
 

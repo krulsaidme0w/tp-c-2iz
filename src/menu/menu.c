@@ -8,13 +8,12 @@
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 1024 * 1024 * 3;
+const size_t SIZE = 800;
 const size_t MAX_BUFFER_LENGTH = 400;
 const char* PATH_TO_FILE = "words.txt";
 
 //consts for with_procs
 const size_t PROCS_COUNT = 2;
-const long MESSAGE_TYPE = 999;
 
 
 char get_char() {
@@ -63,6 +62,31 @@ char *get_string() {
     return buf.string;
 }
 
+size_t menu_max_len(size_t size, size_t max_buffer_length, size_t procs_count, const char* path_to_file) {
+    clock_t begin = clock();
+
+    char* max_word = NULL;
+
+    if(procs_count > 1)
+        max_word = find_max_word_procs(size, max_buffer_length, procs_count, path_to_file);
+    else
+        max_word = find_max_word_no_procs(size, max_buffer_length, procs_count, path_to_file);
+
+    clock_t end = clock();
+
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+    if(max_word == NULL) {
+        printf("can't find max_word\n");
+        return 0;
+    }
+
+    printf("\nlongest word: %s\n", max_word);
+    printf("length: %zu\n", strlen(max_word));
+    printf("time: %f\n", time_spent);
+
+    return strlen(max_word);
+}
 
 void menu() {
     char* command = "0";
@@ -79,41 +103,14 @@ void menu() {
 
         else if(!strcmp(command, "1")) {
 
-            clock_t begin = clock();
-
-            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
-
-            clock_t end = clock();
-
-            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-
-            printf("\nlongest word: %s\n", max_word);
-            printf("length: %zu\n", strlen(max_word));
-            printf("time: %f\n", time_spent);
-
-            free(max_word);
+            menu_max_len(SIZE, MAX_BUFFER_LENGTH, 0, PATH_TO_FILE);
 
             continue;
         }
 
         else if(!strcmp(command, "2")) {
 
-            clock_t begin = clock();
-
-            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
-
-            clock_t end = clock();
-
-            double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-
-            if(max_word == NULL) {
-                printf("can't find max_word\n");
-                continue;
-            }
-
-            printf("\nlongest word: %s\n", max_word);
-            printf("length: %zu\n", strlen(max_word));
-            printf("time: %f\n", time_spent);
+            menu_max_len(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
 
             continue;
         }

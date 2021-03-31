@@ -6,3 +6,6 @@ run:
 
 build-n-run:
 	make build && make run
+
+run-all-tests:
+	cd build/tests/ && ./tests
