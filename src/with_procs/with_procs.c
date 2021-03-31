@@ -15,11 +15,17 @@ typedef struct {
     char mtext[1024];
 } Message;
 
-char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t procs_count, const char* path_to_words, long message_t) {
+const long message_t = 696969;
 
-    size_t parts_size = size / procs_count;
+char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t procs_count, const char* path_to_words) {
 
     int status;
+
+    char* array = create_array(size);
+    size_t words_count = fill_array(array, 0, size - 1, path_to_words, max_buffer_length);
+    char** words_arr = create_matrix(array, path_to_words, max_buffer_length, words_count);
+
+    size_t part_size = words_count / procs_count;
 
     key_t key = IPC_PRIVATE;
     int qid = msgget(key, 0666 | IPC_CREAT);
@@ -37,18 +43,32 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             continue;
         }
 
-        char* array = NULL;
         char* max_word = NULL;
-
-        array = create_array(parts_size);
-        fill_array(array, 0, parts_size - 1, path_to_words, max_buffer_length);
 
         if(array == NULL) {
             printf("can't fill the array\n");
             exit(EXIT_FAILURE);
         }
 
-        max_word = find_max_word(array, 0,  parts_size - 1, max_buffer_length);
+        size_t max_len = 0;
+
+        if(i == procs_count - 1) {
+            for(size_t j = i * part_size; j < words_count; ++j) {
+                if(strlen(words_arr[j]) >= max_len) {
+                    max_len = strlen(words_arr[j]);
+                    max_word = words_arr[j];
+                }
+            }
+        }
+        else {
+            for(size_t j = i * part_size; j < (i + 1) * part_size; ++j) {
+                 if(strlen(words_arr[j]) >= max_len) {
+                     max_len = strlen(words_arr[j]);
+                     max_word = words_arr[j];
+                 }
+            }
+        }
+
 
         if(max_word == NULL) {
             printf("can't find max word\n");
@@ -63,12 +83,10 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             exit(EXIT_FAILURE);
         }
 
-        free(array);
         free(max_word);
 
         exit(EXIT_SUCCESS);
     }
-
 
     for (size_t i = 0; i < procs_count; ++i) {
         if (waitpid(pids[i], &status, 0) != pids[i]) {
@@ -78,7 +96,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         }
     }
 
-    char* max_word = "";
+    char* max_word = NULL;
     size_t max_len = 0;
 
     for (size_t i = 0; i < procs_count; ++i) {
@@ -95,11 +113,20 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             return NULL;
         }
 
-        if(max_len < strlen(message.mtext)) {
-            max_word = message.mtext;
+        if(max_len <= strlen(message.mtext)) {
+            free(max_word);
+            max_word = (char*)malloc(max_buffer_length * sizeof(char));
+
+            if(max_word == NULL) {
+                printf("can't allocate mem to max word\n");
+                return NULL;
+            }
+
+            strcpy(max_word, message.mtext);
             max_len = strlen(message.mtext);
         }
     }
+
 
     return max_word;
 }

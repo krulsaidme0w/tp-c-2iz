@@ -36,6 +36,8 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
 
     FILE *f = open_file(path_to_words);
 
+    size_t words_count = 0;
+
     if(f == NULL) {
         return 0;
     }
@@ -47,6 +49,7 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
         buffer[strlen(buffer) - 1] = '\0';
 
         if (strlen(array) + strlen(buffer) - begin <= end) {
+            words_count++;
             char *t = array + strlen(array);
             strcpy(t, buffer);
         }
@@ -60,42 +63,66 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
         return 0;
     }
 
-    return strlen(array);
+    return words_count;
 }
 
-char* find_max_word(const char* array, size_t begin, size_t end, size_t max_buffer_length) {
+char** create_matrix(const char* array, const char* path_to_words, size_t max_buffer_length, size_t words_count) {
 
-    size_t max_length = 0;
-    char *max_word = NULL;
+    size_t j = 0, k = 0, h = 0;
+    char** words_arr = (char**)malloc(words_count * sizeof(char *));
+    words_arr[k] = (char*)malloc(max_buffer_length * sizeof(char));
 
-    size_t word_length = 0;
-    char* word = (char*)malloc(sizeof(char*) * max_buffer_length);
+    while(array[j] != '\0') {
 
-
-    for(size_t i = begin; i <= end; ++i) {
-        char c = array[i];
-
-        if(c != ' ') {
-            word[word_length] = array[i];
-            word_length++;
+        if(array[j] == ' ') {
+            words_arr[k][h] = '\0';
+            words_arr[++k] = (char*)malloc(max_buffer_length * sizeof(char));
+            j++;
+            h = 0;
         }
         else {
-            if(word_length > max_length) {
-                word[word_length] = '\0';
-                max_length = word_length;
-                max_word = word;
-            }
-            word = (char*)malloc(sizeof(char*) * max_buffer_length);
-            word_length = 0;
+            words_arr[k][h++] = array[j++];
         }
     }
 
-    return max_word;
+    return words_arr;
+}
 
+char* find_max_word(char** array, size_t words_count) {
+
+    size_t max_str_len = 0;
+    char* max_word;
+
+
+    for(size_t i = 0; i < words_count; i++) {
+        if(max_str_len <= strlen(array[i])) {
+            max_str_len = strlen(array[i]);
+            max_word = array[i];
+        }
+    }
+
+
+    return max_word;
 }
 
 bool print_array(char* array) {
     if(printf("%s\n",array) && array != NULL)
         return 1;
     return 0;
+}
+
+char* find_max_word_no_threads(size_t size, size_t max_buffer_length, const size_t procs_count, const char* path_to_words) {
+
+    char* array = create_array(size);
+    size_t words_count = fill_array(array, 0, size - 1, path_to_words, max_buffer_length);
+    char** words_arr = create_matrix(array, path_to_words, max_buffer_length, words_count);
+    char* max_word = find_max_word(words_arr, words_count);
+
+    free(array);
+    for(size_t i = 0; i < words_count; i++) {
+        free(words_arr[i]);
+    }
+    free(words_arr);
+
+    return max_word;
 }

@@ -8,8 +8,8 @@
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 1000;
-const size_t MAX_BUFFER_LENGTH = 1024;
+const size_t SIZE = 1024 * 1024 * 3;
+const size_t MAX_BUFFER_LENGTH = 400;
 const char* PATH_TO_FILE = "words.txt";
 
 //consts for with_procs
@@ -81,9 +81,7 @@ void menu() {
 
             clock_t begin = clock();
 
-            char* array = create_array(SIZE);
-            size_t array_length = fill_array(array, 0, SIZE - 1, PATH_TO_FILE, MAX_BUFFER_LENGTH);
-            char* max_word = find_max_word(array, 0, array_length - 1, MAX_BUFFER_LENGTH);
+            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
 
             clock_t end = clock();
 
@@ -93,7 +91,6 @@ void menu() {
             printf("length: %zu\n", strlen(max_word));
             printf("time: %f\n", time_spent);
 
-            free(array);
             free(max_word);
 
             continue;
@@ -103,7 +100,7 @@ void menu() {
 
             clock_t begin = clock();
 
-            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE, MESSAGE_TYPE);
+            char* max_word = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
 
             clock_t end = clock();
 
