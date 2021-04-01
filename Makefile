@@ -33,7 +33,7 @@ valgrind-with-procs:
 	cd build/tests/with_procs/ && valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --undef-value-errors=no --verbose ./withprocs_test
 
 valgrind:
-	make valgrind-menu && make valgrind-no-procs && valgrind-with-procs
+	make valgrind-menu && make valgrind-no-procs && make valgrind-with-procs
 
 #coverage:
 	#cd build/src//CMakeFiles/storage.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
