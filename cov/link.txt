@@ -1,2 +1,0 @@
-/usr/bin/ar qc libwith_procs.a CMakeFiles/with_procs.dir/with_procs.c.o
-/usr/bin/ranlib libwith_procs.a
