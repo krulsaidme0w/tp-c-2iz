@@ -23,11 +23,11 @@ TEST(FIND, MAX_WORD_WITH_PROCS) {
     free(max_word);
 }
 
-TEST(COMPARE, MAX_WORDS_WITH_PROCS_2_4) {
-    char* max_word1 = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT1, FILE_PATH);
-    char* max_word2 = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT2, FILE_PATH);
-    ASSERT_EQ(!strcmp(max_word1, max_word2), 1);
-    free(max_word1);
-    free(max_word2);
-}
+//TEST(COMPARE, MAX_WORDS_WITH_PROCS_2_4) {
+//    char* max_word1 = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT1, FILE_PATH);
+//    char* max_word2 = find_max_word_procs(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT2, FILE_PATH);
+//    ASSERT_EQ(!strcmp(max_word1, max_word2), 1);
+//    free(max_word1);
+//    free(max_word2);
+//}
 
