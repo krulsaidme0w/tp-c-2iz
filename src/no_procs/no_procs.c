@@ -60,6 +60,8 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
 
     }
 
+    free(buffer);
+
     if(!close_file(f)) {
         return 0;
     }
@@ -71,13 +73,16 @@ char** create_matrix(const char* array, const char* path_to_words, size_t max_bu
 
     size_t j = 0, k = 0, h = 0;
     char** words_arr = (char**)malloc(words_count * sizeof(char *));
-    words_arr[k] = (char*)malloc(max_buffer_length * sizeof(char));
+
+    for(size_t i = 0; i < words_count; ++i) {
+        words_arr[i] = (char*)malloc(max_buffer_length * sizeof(char));
+    }
 
     while(array[j] != '\0') {
         if(array[j] == ' ') {
             words_arr[k][h] = '\0';
-            words_arr[++k] = (char*)malloc(max_buffer_length * sizeof(char));
-            j++;
+            ++j;
+            ++k;
             h = 0;
         }
         else {
@@ -103,7 +108,7 @@ char* find_max_word(char** array, size_t words_count, size_t max_buffer_length) 
     }
 
     if(max_word == NULL) {
-        printf("can't find no procs\n");
+        printf("can't find no_procs\n");
         return NULL;
     }
 
@@ -125,10 +130,13 @@ char* find_max_word_no_procs(size_t size, size_t max_buffer_length, size_t procs
 
     free(array);
 
+
     for(size_t i = 0; i < words_count; i++) {
-        free(words_arr[i]);
+        if(words_arr[i] != NULL)
+            free(words_arr[i]);
     }
-    free(words_arr);
+    if(words_arr != NULL)
+        free(words_arr);
 
     return max_word;
 }

@@ -56,7 +56,10 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             for(size_t j = i * part_size; j < words_count; ++j) {
                 if(strlen(words_arr[j]) >= max_len) {
                     max_len = strlen(words_arr[j]);
-                    max_word = words_arr[j];
+                    if(max_word != NULL)
+                        free(max_word);
+                    max_word = (char*)malloc(max_buffer_length * sizeof(char));
+                    strcpy(max_word, words_arr[j]);
                 }
             }
         }
@@ -64,14 +67,17 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             for(size_t j = i * part_size; j < (i + 1) * part_size; ++j) {
                  if(strlen(words_arr[j]) >= max_len) {
                      max_len = strlen(words_arr[j]);
-                     max_word = words_arr[j];
+                     if(max_word != NULL)
+                         free(max_word);
+                     max_word = (char*)malloc(max_buffer_length * sizeof(char));
+                     strcpy(max_word, words_arr[j]);
                  }
             }
         }
 
 
         if(max_word == NULL) {
-            printf("can't find no procs\n");
+            printf("can't find no_procs\n");
             exit(EXIT_FAILURE);
         }
 
@@ -118,7 +124,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             max_word = (char*)malloc(max_buffer_length * sizeof(char));
 
             if(max_word == NULL) {
-                printf("can't allocate mem to no procs\n");
+                printf("can't allocate mem to no_procs\n");
                 return NULL;
             }
 
@@ -127,6 +133,15 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
         }
     }
 
+    free(pids);
+    free(array);
+
+    for(size_t i = 0; i < words_count; i++) {
+        if(words_arr[i] != NULL)
+            free(words_arr[i]);
+    }
+    if(words_arr != NULL)
+        free(words_arr);
 
     return max_word;
 }

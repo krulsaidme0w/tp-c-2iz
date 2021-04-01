@@ -8,7 +8,7 @@
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 800;
+const size_t SIZE = 1024 * 1024;
 const size_t MAX_BUFFER_LENGTH = 400;
 const char* PATH_TO_FILE = "words.txt";
 
@@ -80,12 +80,13 @@ size_t menu_max_len(size_t size, size_t max_buffer_length, size_t procs_count, c
         printf("can't find max_word\n");
         return 0;
     }
+    size_t res = strlen(max_word);
 
     printf("\nlongest word: %s\n", max_word);
     printf("length: %zu\n", strlen(max_word));
     printf("time: %f\n", time_spent);
-
-    return strlen(max_word);
+    free(max_word);
+    return res;
 }
 
 void menu() {
