@@ -51,6 +51,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cov
-          path: build/src/menu/CMakeFiles/menu/coverage
+          path: build/src/menu/CMakeFiles/menu.dir/coverage
 
 
