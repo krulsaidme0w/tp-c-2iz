@@ -1,0 +1,56 @@
+name: ci
+on:
+  push:
+    branches: [dev, main]
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install build-essential
+        run: sudo apt install build-essential
+
+      - name: install lcov
+        run: sudo apt install lcov
+
+      - name: install valgrind
+        run: sudo apt install valgrind
+
+      - name: installing python3
+        run: sudo apt install python3
+
+      - name: install git
+        run: sudo apt install git
+
+      - name: install gtest
+        run: sudo apt install libgtest-dev
+
+      - name: gen words
+        run: make gen-words
+
+      - name: build project
+        run: make build-pr
+
+      - name: run tests
+        run: make run-all-tests
+
+      - name: valgrind
+        run: make valgrind
+
+      - name: get coverage
+        run: make coverage
+
+      - name: cov
+        uses: actions/upload-artifact@v2
+        with:
+          name: cov
+          path: cov
+
+
