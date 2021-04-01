@@ -5,8 +5,7 @@ run-pr:
 	cd build/cmd/ && ./main
 
 build-n-run:
-	make build && make run
-
+	make build-pr && make run-pr
 
 run-menu-test:
 	cd build/tests/menu && ./menu_test
