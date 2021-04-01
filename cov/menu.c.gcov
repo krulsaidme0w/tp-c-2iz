@@ -1,0 +1,134 @@
+        -:    0:Source:/home/krul/Documents/tp-c-2iz/src/menu/menu.c
+        -:    0:Graph:menu.c.gcno
+        -:    0:Data:menu.c.gcda
+        -:    0:Runs:2
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <string.h>
+        -:    4:#include <time.h>
+        -:    5:
+        -:    6:#include "no_procs.h"
+        -:    7:#include "with_procs.h"
+        -:    8:#include "menu.h"
+        -:    9:
+        -:   10://consts for no_procs
+        -:   11:const size_t SIZE = 1024 * 1024;
+        -:   12:const size_t MAX_BUFFER_LENGTH = 400;
+        -:   13:const char* PATH_TO_FILE = "words.txt";
+        -:   14:
+        -:   15://consts for with_procs
+        -:   16:const size_t PROCS_COUNT = 2;
+        -:   17:
+        -:   18:
+    #####:   19:char get_char() {
+    #####:   20:    char c = '\0';
+    #####:   21:    int result = 0;
+        -:   22:
+        -:   23:    do {
+    #####:   24:        result = scanf("%c", &c);
+    #####:   25:    } while (result != 1);
+        -:   26:
+    #####:   27:    return c;
+        -:   28:}
+        -:   29:
+    #####:   30:char *get_string() {
+        -:   31:
+        -:   32:    struct buffer {
+        -:   33:        char *string;
+        -:   34:        size_t size;
+        -:   35:        size_t capacity;
+    #####:   36:    } buf = {NULL, 0, 0};
+        -:   37:
+    #####:   38:    char c = '\0';
+        -:   39:
+    #####:   40:    while (c = get_char(), c != EOF && c != '\n') {
+    #####:   41:        if (buf.size + 1 >= buf.capacity) {
+    #####:   42:            size_t new_capacity = !buf.capacity ? 1 : buf.capacity * 2;
+    #####:   43:            char *tmp = (char *)malloc((new_capacity + 1) * sizeof(char));
+    #####:   44:            if (!tmp) {
+    #####:   45:                if (buf.string) {
+    #####:   46:                    free(buf.string);
+        -:   47:                }
+    #####:   48:                return NULL;
+        -:   49:            }
+    #####:   50:            if (buf.string) {
+    #####:   51:                tmp = strcpy(tmp, buf.string);
+    #####:   52:                free(buf.string);
+        -:   53:            }
+    #####:   54:            buf.string = tmp;
+    #####:   55:            buf.capacity = new_capacity;
+        -:   56:        }
+    #####:   57:        buf.string[buf.size] = c;
+    #####:   58:        buf.string[buf.size + 1] = '\0';
+    #####:   59:        ++buf.size;
+        -:   60:    }
+        -:   61:
+    #####:   62:    return buf.string;
+        -:   63:}
+        -:   64:
+       28:   65:size_t menu_max_len(size_t size, size_t max_buffer_length, size_t procs_count, const char* path_to_file) {
+       28:   66:    clock_t begin = clock();
+        -:   67:
+       28:   68:    char* max_word = NULL;
+        -:   69:
+       28:   70:    if(procs_count > 1)
+       14:   71:        max_word = find_max_word_procs(size, max_buffer_length, procs_count, path_to_file);
+        -:   72:    else
+       14:   73:        max_word = find_max_word_no_procs(size, max_buffer_length, procs_count, path_to_file);
+        -:   74:
+       28:   75:    clock_t end = clock();
+        -:   76:
+       28:   77:    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+        -:   78:
+       28:   79:    if(max_word == NULL) {
+    #####:   80:        printf("can't find max_word\n");
+    #####:   81:        return 0;
+        -:   82:    }
+       28:   83:    size_t res = strlen(max_word);
+        -:   84:
+       28:   85:    printf("\nlongest word: %s\n", max_word);
+       28:   86:    printf("length: %zu\n", strlen(max_word));
+       28:   87:    printf("time: %f\n", time_spent);
+       28:   88:    free(max_word);
+       28:   89:    return res;
+        -:   90:}
+        -:   91:
+    #####:   92:void menu() {
+    #####:   93:    char* command = "0";
+        -:   94:
+        -:   95:    do
+        -:   96:    {
+    #####:   97:        if(!strcmp(command, "0")) {
+    #####:   98:            printf("0. help\n");
+    #####:   99:            printf("1. create array(no threads)\n");
+    #####:  100:            printf("2. create array(with processes)\n");
+    #####:  101:            printf("3. exit");
+    #####:  102:            continue;
+        -:  103:        }
+        -:  104:
+    #####:  105:        else if(!strcmp(command, "1")) {
+        -:  106:
+    #####:  107:            menu_max_len(SIZE, MAX_BUFFER_LENGTH, 0, PATH_TO_FILE);
+        -:  108:
+    #####:  109:            continue;
+        -:  110:        }
+        -:  111:
+    #####:  112:        else if(!strcmp(command, "2")) {
+        -:  113:
+    #####:  114:            menu_max_len(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
+        -:  115:
+    #####:  116:            continue;
+        -:  117:        }
+        -:  118:
+    #####:  119:        else if(!strcmp(command, "3")) {
+    #####:  120:            printf("\ngoodbye!\n");
+    #####:  121:            break;
+        -:  122:        }
+        -:  123:
+        -:  124:        else {
+    #####:  125:            printf("unknown command: %s\n", command);
+        -:  126:        }
+        -:  127:
+    #####:  128:    } while(printf("\ninput command number (0 - help): "), command = get_string(), command != NULL);
+        -:  129:
+    #####:  130:}

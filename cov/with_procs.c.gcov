@@ -1,0 +1,153 @@
+        -:    0:Source:/home/krul/Documents/tp-c-2iz/src/with_procs/with_procs.c
+        -:    0:Graph:with_procs.c.gcno
+        -:    0:Data:with_procs.c.gcda
+        -:    0:Runs:3
+        -:    1:#include <sys/types.h>
+        -:    2:#include <sys/wait.h>
+        -:    3:#include <sys/ipc.h>
+        -:    4:#include <sys/msg.h>
+        -:    5:#include <unistd.h>
+        -:    6:#include <stdio.h>
+        -:    7:#include <stdlib.h>
+        -:    8:#include <string.h>
+        -:    9:
+        -:   10:#include "no_procs.h"
+        -:   11:#include "with_procs.h"
+        -:   12:
+        -:   13:typedef struct {
+        -:   14:    long mtype;
+        -:   15:    char mtext[1024];
+        -:   16:} Message;
+        -:   17:
+        -:   18:const long message_t = 696969;
+        -:   19:
+       17:   20:char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t procs_count, const char* path_to_words) {
+        -:   21:
+        -:   22:    int status;
+        -:   23:
+       17:   24:    char* array = create_array(size);
+       17:   25:    size_t words_count = fill_array(array, 0, size - 1, path_to_words, max_buffer_length);
+       17:   26:    char** words_arr = create_matrix(array, path_to_words, max_buffer_length, words_count);
+        -:   27:
+       17:   28:    size_t part_size = words_count / procs_count;
+        -:   29:
+       17:   30:    key_t key = IPC_PRIVATE;
+       17:   31:    int qid = msgget(key, 0666 | IPC_CREAT);
+       17:   32:    pid_t* pids = (pid_t *)malloc(sizeof(pid_t) * procs_count);
+        -:   33:
+       17:   34:    if(pids == NULL) {
+    #####:   35:        printf("can't allocate memory for pids\n");
+    #####:   36:        return NULL;
+        -:   37:    }
+        -:   38:
+       53:   39:    for(size_t i = 0; i < procs_count; ++i) {
+       36:   40:        pids[i] = fork();
+        -:   41:
+       72:   42:        if (pids[i] != 0) {
+       36:   43:            continue;
+        -:   44:        }
+        -:   45:
+       36:   46:        char* max_word = NULL;
+        -:   47:
+       36:   48:        if(array == NULL) {
+    #####:   49:            printf("can't fill the array\n");
+    #####:   50:            exit(EXIT_FAILURE);
+        -:   51:        }
+        -:   52:
+       36:   53:        size_t max_len = 0;
+        -:   54:
+       36:   55:        if(i == procs_count - 1) {
+     6793:   56:            for(size_t j = i * part_size; j < words_count; ++j) {
+     6776:   57:                if(strlen(words_arr[j]) >= max_len) {
+       66:   58:                    max_len = strlen(words_arr[j]);
+       66:   59:                    if(max_word != NULL)
+       49:   60:                        free(max_word);
+       66:   61:                    max_word = (char*)malloc(max_buffer_length * sizeof(char));
+       66:   62:                    strcpy(max_word, words_arr[j]);
+        -:   63:                }
+        -:   64:            }
+        -:   65:        }
+        -:   66:        else {
+     6788:   67:            for(size_t j = i * part_size; j < (i + 1) * part_size; ++j) {
+     6769:   68:                 if(strlen(words_arr[j]) >= max_len) {
+       77:   69:                     max_len = strlen(words_arr[j]);
+       77:   70:                     if(max_word != NULL)
+       58:   71:                         free(max_word);
+       77:   72:                     max_word = (char*)malloc(max_buffer_length * sizeof(char));
+       77:   73:                     strcpy(max_word, words_arr[j]);
+        -:   74:                 }
+        -:   75:            }
+        -:   76:        }
+        -:   77:
+        -:   78:
+       36:   79:        if(max_word == NULL) {
+    #####:   80:            printf("can't find no_procs\n");
+    #####:   81:            exit(EXIT_FAILURE);
+        -:   82:        }
+        -:   83:
+       36:   84:        Message message = {message_t, ""};
+       36:   85:        strcpy(message.mtext, max_word);
+        -:   86:
+       36:   87:        if(-1 == msgsnd(qid, (struct msgbuf *)&message, strlen(message.mtext) + 1, 0)) {
+    #####:   88:            printf("can't send msg\n");
+    #####:   89:            exit(EXIT_FAILURE);
+        -:   90:        }
+        -:   91:
+       36:   92:        free(max_word);
+        -:   93:
+       36:   94:        exit(EXIT_SUCCESS);
+        -:   95:    }
+        -:   96:
+       53:   97:    for (size_t i = 0; i < procs_count; ++i) {
+       36:   98:        if (waitpid(pids[i], &status, 0) != pids[i]) {
+    #####:   99:            printf("can't wait for pids\n");
+    #####:  100:            free(pids);
+    #####:  101:            return NULL;
+        -:  102:        }
+        -:  103:    }
+        -:  104:
+       17:  105:    char* max_word = NULL;
+       17:  106:    size_t max_len = 0;
+        -:  107:
+       53:  108:    for (size_t i = 0; i < procs_count; ++i) {
+        -:  109:        Message message;
+        -:  110:
+       36:  111:        if(-1 == msgrcv(qid, (struct msgbuf *)&message, max_buffer_length, message_t, 0)) {
+    #####:  112:            printf("can't receive msg\n");
+    #####:  113:            free(pids);
+    #####:  114:            return NULL;
+        -:  115:        }
+        -:  116:
+       36:  117:        if(message.mtext[0] == '\0') {
+    #####:  118:            printf("can't receive max_word\n");
+    #####:  119:            return NULL;
+        -:  120:        }
+        -:  121:
+       36:  122:        if(max_len <= strlen(message.mtext)) {
+       23:  123:            free(max_word);
+       23:  124:            max_word = (char*)malloc(max_buffer_length * sizeof(char));
+        -:  125:
+       23:  126:            if(max_word == NULL) {
+    #####:  127:                printf("can't allocate mem to no_procs\n");
+    #####:  128:                return NULL;
+        -:  129:            }
+        -:  130:
+       23:  131:            strcpy(max_word, message.mtext);
+       23:  132:            max_len = strlen(message.mtext);
+        -:  133:        }
+        -:  134:    }
+        -:  135:
+       17:  136:    free(pids);
+       17:  137:    free(array);
+        -:  138:
+    13562:  139:    for(size_t i = 0; i < words_count; i++) {
+    13545:  140:        if(words_arr[i] != NULL)
+    13545:  141:            free(words_arr[i]);
+        -:  142:    }
+       17:  143:    if(words_arr != NULL)
+       17:  144:        free(words_arr);
+        -:  145:
+       17:  146:    return max_word;
+        -:  147:}
+        -:  148:
+        -:  149:

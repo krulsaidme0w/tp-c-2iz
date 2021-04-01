@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/no_procs/no_procs.h
+stdbool.h
+-
+
+/home/krul/Documents/tp-c-2iz/src/with_procs/with_procs.c
+sys/types.h
+-
+sys/wait.h
+-
+sys/ipc.h
+-
+sys/msg.h
+-
+unistd.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+no_procs.h
+/home/krul/Documents/tp-c-2iz/src/with_procs/no_procs.h
+with_procs.h
+/home/krul/Documents/tp-c-2iz/src/with_procs/with_procs.h
+
+/home/krul/Documents/tp-c-2iz/src/with_procs/with_procs.h
+

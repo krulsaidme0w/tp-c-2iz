@@ -1,0 +1,146 @@
+        -:    0:Source:/home/krul/Documents/tp-c-2iz/src/no_procs/no_procs.c
+        -:    0:Graph:no_procs.c.gcno
+        -:    0:Data:no_procs.c.gcda
+        -:    0:Runs:4
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include <string.h>
+        -:    5:
+        -:    6:#include "no_procs.h"
+        -:    7:
+       34:    8:char* create_array(size_t size) {
+       34:    9:    char* array = (char *)malloc(size * sizeof(char));
+       34:   10:    array[0] = '\0';
+       34:   11:    return array;
+        -:   12:}
+        -:   13:
+       35:   14:FILE* open_file(const char* path) {
+        -:   15:    FILE  *f;
+       35:   16:    f = fopen(path, "r");
+        -:   17:
+       35:   18:    if (f != NULL) {
+       35:   19:        return f;
+        -:   20:    }
+        -:   21:    else {
+    #####:   22:        printf("can't open file\n");
+    #####:   23:        return NULL;
+        -:   24:    }
+        -:   25:}
+        -:   26:
+       35:   27:bool close_file(FILE *f) {
+       35:   28:    if(!fclose(f)) {
+       35:   29:        return 1;
+        -:   30:    }
+        -:   31:    else {
+    #####:   32:        return 0;
+        -:   33:    }
+        -:   34:}
+        -:   35:
+       34:   36:size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_words, size_t max_buffer_length) {
+        -:   37:
+       34:   38:    FILE *f = open_file(path_to_words);
+        -:   39:
+       34:   40:    size_t words_count = 0;
+        -:   41:
+       34:   42:    if(f == NULL) {
+    #####:   43:        return 0;
+        -:   44:    }
+        -:   45:
+       34:   46:    char* buffer = (char*)malloc(sizeof(char*) * max_buffer_length);
+        -:   47:
+    27124:   48:    while(fgets(buffer, max_buffer_length, f) != NULL) {
+        -:   49:
+    27124:   50:        buffer[strlen(buffer) - 1] = '\0';
+        -:   51:
+    27124:   52:        if (strlen(array) + strlen(buffer) - begin <= end) {
+    27090:   53:            words_count++;
+    27090:   54:            char *t = array + strlen(array);
+    27090:   55:            strcpy(t, buffer);
+        -:   56:        }
+        -:   57:        else {
+       34:   58:            break;
+        -:   59:        }
+        -:   60:
+        -:   61:    }
+        -:   62:
+       34:   63:    free(buffer);
+        -:   64:
+       34:   65:    if(!close_file(f)) {
+    #####:   66:        return 0;
+        -:   67:    }
+        -:   68:
+       34:   69:    return words_count;
+        -:   70:}
+        -:   71:
+       33:   72:char** create_matrix(const char* array, const char* path_to_words, size_t max_buffer_length, size_t words_count) {
+        -:   73:
+       33:   74:    size_t j = 0, k = 0, h = 0;
+       33:   75:    char** words_arr = (char**)malloc(words_count * sizeof(char *));
+        -:   76:
+    27118:   77:    for(size_t i = 0; i < words_count; ++i) {
+    27085:   78:        words_arr[i] = (char*)malloc(max_buffer_length * sizeof(char));
+        -:   79:    }
+        -:   80:
+  4785789:   81:    while(array[j] != '\0') {
+  4785756:   82:        if(array[j] == ' ') {
+    27085:   83:            words_arr[k][h] = '\0';
+    27085:   84:            ++j;
+    27085:   85:            ++k;
+    27085:   86:            h = 0;
+        -:   87:        }
+        -:   88:        else {
+  4758671:   89:            words_arr[k][h++] = array[j++];
+        -:   90:        }
+        -:   91:    }
+        -:   92:
+       33:   93:    return words_arr;
+        -:   94:}
+        -:   95:
+       15:   96:char* find_max_word(char** array, size_t words_count, size_t max_buffer_length) {
+        -:   97:
+       15:   98:    size_t max_str_len = 0;
+       15:   99:    char* max_word = NULL;
+        -:  100:
+    13550:  101:    for(size_t i = 0; i < words_count; i++) {
+    13535:  102:        if(max_str_len <= strlen(array[i])) {
+       91:  103:            max_str_len = strlen(array[i]);
+       91:  104:            free(max_word);
+       91:  105:            max_word = (char*)malloc(max_buffer_length * sizeof(char));
+       91:  106:            strcpy(max_word, array[i]);
+        -:  107:        }
+        -:  108:    }
+        -:  109:
+       15:  110:    if(max_word == NULL) {
+    #####:  111:        printf("can't find no_procs\n");
+    #####:  112:        return NULL;
+        -:  113:    }
+        -:  114:
+       15:  115:    return max_word;
+        -:  116:}
+        -:  117:
+    #####:  118:bool print_array(char* array) {
+    #####:  119:    if(printf("%s\n",array) && array != NULL)
+    #####:  120:        return 1;
+    #####:  121:    return 0;
+        -:  122:}
+        -:  123:
+       14:  124:char* find_max_word_no_procs(size_t size, size_t max_buffer_length, size_t procs_count, const char* path_to_words) {
+        -:  125:
+       14:  126:    char* array = create_array(size);
+       14:  127:    size_t words_count = fill_array(array, 0, size - 1, path_to_words, max_buffer_length);
+       14:  128:    char** words_arr = create_matrix(array, path_to_words, max_buffer_length, words_count);
+       14:  129:    char* max_word = find_max_word(words_arr, words_count, max_buffer_length);
+        -:  130:
+       14:  131:    free(array);
+        -:  132:
+        -:  133:
+    13544:  134:    for(size_t i = 0; i < words_count; i++) {
+    13530:  135:        if(words_arr[i] != NULL)
+    13530:  136:            free(words_arr[i]);
+        -:  137:    }
+       14:  138:    if(words_arr != NULL)
+       14:  139:        free(words_arr);
+        -:  140:
+       14:  141:    return max_word;
+        -:  142:}

@@ -34,14 +34,17 @@ valgrind-with-procs:
 valgrind:
 	make valgrind-menu && make valgrind-no-procs && make valgrind-with-procs
 
+create-cov-dir:
+	mkdir cov
+
 coverage-menu:
-	cd build/src/menu/CMakeFiles/menu.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+	cd build/src/menu/CMakeFiles/menu.dir && gcov *.gcno && cp -rf . ../../../../../cov/
 
 coverage-no-procs:
-	cd build/src/no_procs/CMakeFiles/no_procs.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+	cd build/src/no_procs/CMakeFiles/no_procs.dir && gcov *.gcno && cp -rf . ../../../../../cov/
 
 coverage-with-procs:
-	cd build/src/with_procs/CMakeFiles/with_procs.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+	cd build/src/with_procs/CMakeFiles/with_procs.dir && gcov *.gcno && cp -rf . ../../../../../cov/
 
 coverage:
-	make coverage-menu && make coverage-no-procs && make coverage-with-procs
+	make create-cov-dir && make coverage-menu && make coverage-no-procs && make coverage-with-procs && cd cov && lcov --capture --directory . --output-file coverage.info && mkdir cov && genhtml coverage.info --output-directory cov
