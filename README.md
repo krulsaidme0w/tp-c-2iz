@@ -19,3 +19,4 @@ ci
 ```
 github actions
 ```
+cov in github actions
