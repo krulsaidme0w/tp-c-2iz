@@ -44,13 +44,13 @@ jobs:
       - name: valgrind
         run: make valgrind
 
-#      - name: get coverage
-#        run: make coverage
+      - name: get coverage
+        run: make coverage
 
-#      - name: cov
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: cov
-#          path: build/src/storage-device/CMakeFiles/storage.dir/coverage
+      - name: cov
+        uses: actions/upload-artifact@v2
+        with:
+          name: cov
+          path: build/src/menu/CMakeFiles/menu/coverage
 
 

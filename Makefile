@@ -34,5 +34,14 @@ valgrind-with-procs:
 valgrind:
 	make valgrind-menu && make valgrind-no-procs && make valgrind-with-procs
 
-#coverage:
-	#cd build/src//CMakeFiles/storage.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+coverage-menu:
+	cd build/src/menu/CMakeFiles/menu.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+
+coverage-no-procs:
+	cd build/src/no_procs/CMakeFiles/no_procs.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+
+coverage-with-procs:
+	cd build/src/with_procs/CMakeFiles/with_procs.dir && gcov *.gcno && lcov --capture --directory . --output-file coverage.info && mkdir coverage && genhtml coverage.info --output-directory coverage
+
+coverage:
+	make coverage-menu && make coverage-no-procs && make coverage-with-procs
