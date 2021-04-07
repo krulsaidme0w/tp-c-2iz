@@ -8,7 +8,7 @@
 #include "menu.h"
 
 //consts for no_procs
-#define SIZE 104857600
+#define SIZE 10485760
 #define MAX_BUFFER_LENGTH 400
 #define PATH_TO_FILE "words.txt"
 
