@@ -22,8 +22,8 @@ github actions
 ```
 average with 10 MB
 ```
-with procs - 26.684941
-no procs - 26.515425
+with procs - 26.684941 s
+no procs - 26.515425 s
 ```
 
 
