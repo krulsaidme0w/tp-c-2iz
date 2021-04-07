@@ -19,9 +19,4 @@ ci
 ```
 github actions
 ```
-<<<<<<< HEAD
-
-
-=======
-cov is in github actions
->>>>>>> 84c9ca4f6186c4201c2dd3fd9bbb91a746d757bf
+check test branch (all code there)
