@@ -20,5 +20,11 @@ ci
 ```
 github actions
 ```
+average with 10 MB
+```
+with procs - 26.684941
+no procs - 26.515425
+```
+
 
 # tp-c-2iz
