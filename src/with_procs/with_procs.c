@@ -13,7 +13,7 @@
 typedef struct {
     long mtype;
     char mtext[1024];
-} Message;
+} message_buff;
 
 const long message_t = 696969;
 
@@ -81,7 +81,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
             exit(EXIT_FAILURE);
         }
 
-        Message message = {message_t, ""};
+        message_buff message = {message_t, ""};
         strcpy(message.mtext, max_word);
 
         if(-1 == msgsnd(qid, (struct msgbuf *)&message, strlen(message.mtext) + 1, 0)) {
@@ -106,7 +106,7 @@ char* find_max_word_procs(size_t size, size_t max_buffer_length, const size_t pr
     size_t max_len = 0;
 
     for (size_t i = 0; i < procs_count; ++i) {
-        Message message;
+        message_buff message;
 
         if(-1 == msgrcv(qid, (struct msgbuf *)&message, max_buffer_length, message_t, 0)) {
             printf("can't receive msg\n");

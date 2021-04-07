@@ -8,12 +8,12 @@
 #include "menu.h"
 
 //consts for no_procs
-const size_t SIZE = 1024 * 1024;
-const size_t MAX_BUFFER_LENGTH = 400;
-const char* PATH_TO_FILE = "words.txt";
+#define SIZE 104857600
+#define MAX_BUFFER_LENGTH 400
+#define PATH_TO_FILE "words.txt"
 
 //consts for with_procs
-const size_t PROCS_COUNT = 2;
+#define PROCS_COUNT 2
 
 
 char get_char() {
@@ -67,10 +67,21 @@ size_t menu_max_len(size_t size, size_t max_buffer_length, size_t procs_count, c
 
     char* max_word = NULL;
 
-    if(procs_count > 1)
+    if(procs_count > 1) {
         max_word = find_max_word_procs(size, max_buffer_length, procs_count, path_to_file);
-    else
+
+        if (max_word == NULL) {
+            return 0;
+        }
+    }
+
+    else {
         max_word = find_max_word_no_procs(size, max_buffer_length, procs_count, path_to_file);
+
+        if (max_word == NULL) {
+            return 0;
+        }
+    }
 
     clock_t end = clock();
 
@@ -91,10 +102,14 @@ size_t menu_max_len(size_t size, size_t max_buffer_length, size_t procs_count, c
 
 void menu() {
     char* command = "0";
+    char* info = "0";
+    char* no_procs = "1";
+    char* with_procs = "2";
+    char* exit = "3";
 
     do
     {
-        if(!strcmp(command, "0")) {
+        if(!strcmp(command, info)) {
             printf("0. help\n");
             printf("1. create array(no threads)\n");
             printf("2. create array(with processes)\n");
@@ -102,21 +117,21 @@ void menu() {
             continue;
         }
 
-        else if(!strcmp(command, "1")) {
+        else if(!strcmp(command, no_procs)) {
 
             menu_max_len(SIZE, MAX_BUFFER_LENGTH, 0, PATH_TO_FILE);
 
             continue;
         }
 
-        else if(!strcmp(command, "2")) {
+        else if(!strcmp(command, with_procs)) {
 
             menu_max_len(SIZE, MAX_BUFFER_LENGTH, PROCS_COUNT, PATH_TO_FILE);
 
             continue;
         }
 
-        else if(!strcmp(command, "3")) {
+        else if(!strcmp(command, exit)) {
             printf("\ngoodbye!\n");
             break;
         }

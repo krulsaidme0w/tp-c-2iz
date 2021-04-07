@@ -35,6 +35,14 @@ bool close_file(FILE *f) {
 
 size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_words, size_t max_buffer_length) {
 
+    if(array == NULL) {
+        return 0;
+    }
+
+    if(path_to_words == NULL) {
+        return 0;
+    }
+
     FILE *f = open_file(path_to_words);
 
     size_t words_count = 0;
@@ -45,6 +53,10 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
 
     char* buffer = (char*)malloc(sizeof(char*) * max_buffer_length);
 
+    if(buffer == NULL) {
+        return 0;
+    }
+
     while(fgets(buffer, max_buffer_length, f) != NULL) {
 
         buffer[strlen(buffer) - 1] = '\0';
@@ -52,7 +64,10 @@ size_t fill_array(char *array, size_t begin, size_t end, const char* path_to_wor
         if (strlen(array) + strlen(buffer) - begin <= end) {
             words_count++;
             char *t = array + strlen(array);
-            strcpy(t, buffer);
+
+            if(strcpy(t, buffer) == NULL) {
+                return 0;
+            }
         }
         else {
             break;
@@ -116,9 +131,15 @@ char* find_max_word(char** array, size_t words_count, size_t max_buffer_length) 
 }
 
 bool print_array(char* array) {
+
+    if(array == NULL) {
+        return false;
+    }
+
     if(printf("%s\n",array) && array != NULL)
-        return 1;
-    return 0;
+        return true;
+    
+    return false;
 }
 
 char* find_max_word_no_procs(size_t size, size_t max_buffer_length, size_t procs_count, const char* path_to_words) {

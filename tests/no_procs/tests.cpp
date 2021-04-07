@@ -9,12 +9,12 @@ extern "C" {
 }
 
 //consts
-const size_t SIZE = 1024;
-const size_t MAX_BUFFER_LENGTH = 400;
-const char* FILE_PATH = "words.txt";
+#define SIZE 1024
+#define MAX_BUFFER_LENGTH 400
+#define FILE_PATH "words.txt"
 
 //consts for with_procs
-const size_t PROCS_COUNT = 2;
+#define PROCS_COUNT 2
 
 
 //files tests
@@ -45,9 +45,9 @@ TEST(ARRAY, MATRIX) {
     char** words = create_matrix(array, FILE_PATH, MAX_BUFFER_LENGTH, words_count);
 
     for(size_t i = 0; i < words_count; i++) {
-        ASSERT_EQ(words[i] != NULL, 1);
+        ASSERT_EQ(words[i] != nullptr, 1);
     }
-    ASSERT_EQ(words != NULL, 1);
+    ASSERT_EQ(words != nullptr, 1);
 
     for(size_t i = 0; i < words_count; i++) {
         free(words[i]);
@@ -66,7 +66,7 @@ TEST(ARRAY, FIND_MAX) {
 
     char* max_word = find_max_word(words, words_count, MAX_BUFFER_LENGTH);
 
-    ASSERT_EQ(max_word != NULL, 1);
+    ASSERT_EQ(max_word != nullptr, 1);
 
     for(size_t i = 0; i < words_count; i++) {
     free(words[i]);
